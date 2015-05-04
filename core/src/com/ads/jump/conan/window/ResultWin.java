@@ -2,7 +2,7 @@ package com.ads.jump.conan.window;
 
 import com.ads.jump.conan.Answer;
 import com.ads.jump.conan.Assets;
-import com.ads.jump.conan.MyGame;
+import com.ads.jump.conan.PEvent;
 import com.ads.jump.conan.Settings;
 import com.ads.jump.conan.screen.GameScreen;
 import com.badlogic.gdx.Gdx;
@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -38,17 +37,17 @@ public class ResultWin extends BaseWin {
     private ImageButton gateBtn;
     private ImageButton refresh;
     private ImageButton next;
-    private Group group;
+    private float win_H;
+    private PEvent pEvent;
 
     public ResultWin(GameScreen gs, int num) {
-        super(Answer.TITLES[num], new WindowStyle(gs.getGameFont(), Color.WHITE, new TextureRegionDrawable(
+        super(Answer.TITLES[num], new WindowStyle(gs.getWindowFont(), Color.WHITE, new TextureRegionDrawable(
                 Assets.winBg)));
         starNum = num;
         gameScreen = gs;
+        pEvent = gs.getMyGame().getPEvent();
         create();
     }
-
-    float win_H;
 
     public void create() {
         float btnSize = Assets.WIDTH / 6;
@@ -62,11 +61,10 @@ public class ResultWin extends BaseWin {
         addStars();
         addActor(gateBtn);
         addActor(refresh);
-        if (starNum > 0) {
+        if (starNum > 0 && starNum < 4) {
             addActor(next);
         }
         initEffect();
-        group = gameScreen.getStage().getRoot();
     }
 
     private void addButtons() {
@@ -93,11 +91,10 @@ public class ResultWin extends BaseWin {
                 Rectangle bound = new Rectangle(0, 0, gateBtn.getWidth(), gateBtn.getHeight());
                 if (bound.contains(x, y)) {
                     Assets.playSound(Assets.btnSound);
-                    if (starNum > 0) {//时间已到,回关卡时,不能更新状态
-                        int nextGateNum = updateGateNum();
-                        gameScreen.getGateScreen().buildGateImage((nextGateNum - 1) / Assets.SCREEN_GATE_MAX);
-                    } else {
-                        gameScreen.getGateScreen().buildGateImage((Settings.unlockGateNum - 1) / Assets.SCREEN_GATE_MAX);
+                    if (starNum > 0) {
+                        gameScreen.getGateScreen().buildGateImage(gameScreen.getGateScreen().getPageNo(updateGateNum()));
+                    } else {//时间已到,回关卡时,不能更新状态
+                        gameScreen.getGateScreen().buildGateImage(gameScreen.getGateScreen().getPageNo(Settings.unlockGateNum));
                     }
                     layerBg.remove();
                     ResultWin.this.remove();
@@ -124,7 +121,12 @@ public class ResultWin extends BaseWin {
                         Answer.gateStars.set(t, 0);
                     }
                     layerBg.remove();
-                    gameScreen.return2init();
+                    gameScreen.getAreaGroup().handler(t);
+                    if (starNum == 4) {
+                        gameScreen.pass2false();
+                    } else {
+                        gameScreen.return2init();
+                    }
                     ResultWin.this.remove();
                 }
                 super.touchUp(event, x, y, pointer, button);
@@ -142,16 +144,19 @@ public class ResultWin extends BaseWin {
                 Rectangle bound = new Rectangle(0, 0, next.getWidth(), next.getHeight());
                 if (bound.contains(x, y)) {
                     Assets.playSound(Assets.btnSound);
-                    layerBg.remove();
-                    int nextGateNum = updateGateNum();
-                    ResultWin.this.remove();
-                    gameScreen.return2init();
-                    if (Answer.isAllPass(nextGateNum)) {
-                        //TODO 通关
-                        MyGame MyGame = gameScreen.getMyGame();
-                        MyGame.getPEvent().pass();
-                        gameScreen.getGateScreen().buildGateImage(Assets.GATE_PAGE_MAX);
-                        MyGame.setScreen(MyGame.getMainScreen());
+                    if (gameScreen.nextNeedClickAD()) {
+                        pEvent.showClickAdInfo();
+                    } else {
+                        layerBg.remove();
+                        int nextGateNum = updateGateNum();
+                        ResultWin.this.remove();
+                        gameScreen.return2init();
+                        if (Answer.isAllPass(nextGateNum)) {
+                            //TODO 通关
+                            pEvent.pass();
+                            gameScreen.getGateScreen().buildGateImage(Assets.GATE_PAGE_MAX);
+                            gameScreen.getMyGame().convert2MainScreen();
+                        }
                     }
                 }
                 super.touchUp(event, x, y, pointer, button);
@@ -169,7 +174,7 @@ public class ResultWin extends BaseWin {
             if (Answer.gateStars.size() <= nextGateNum) {
                 Answer.gateStars.add(0);
             }
-            gameScreen.getMyGame().getPEvent().save();
+            pEvent.save();
         }
         return nextGateNum;
     }
@@ -199,7 +204,7 @@ public class ResultWin extends BaseWin {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        if (starNum > 0) {
+        if (starNum > 0 && starNum < 4) {
             if (!end) {
                 if (!exeTimer) {
                     changeStar();

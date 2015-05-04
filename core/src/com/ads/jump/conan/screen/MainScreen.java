@@ -34,8 +34,6 @@ public class MainScreen extends BaseScreen {
     public void show() {
         if (!isShow()) {
             super.show();
-            Image startBg = new Image(Assets.startBg);
-            startBg.setBounds(0, Assets.HEIGHT - Assets.TOPBAR_HEIGHT - Assets.WIDTH, Assets.WIDTH,  Assets.WIDTH);
             float playSize = Assets.WIDTH / 3;
             float spaceSize = Assets.WIDTH / 12;
             float btnPlayX = (Assets.WIDTH - playSize) / 2;
@@ -163,7 +161,6 @@ public class MainScreen extends BaseScreen {
                 }
             });
 
-            addActor(startBg);
             addActor(playBtn);
             addActor(aboutBtn);
             addActor(music);

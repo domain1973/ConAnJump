@@ -1,7 +1,7 @@
 package com.ads.jump.conan.window;
 
-import com.ads.jump.conan.MyGame;
 import com.ads.jump.conan.Assets;
+import com.ads.jump.conan.MyGame;
 import com.ads.jump.conan.Settings;
 import com.ads.jump.conan.screen.GameScreen;
 import com.badlogic.gdx.Gdx;
@@ -28,7 +28,7 @@ public class SupsendWin extends BaseWin {
     private Image noSound;
 
     public SupsendWin(GameScreen gs, int gp) {
-        super("", new Window.WindowStyle(gs.getGameFont(), Color.WHITE, new TextureRegionDrawable(
+        super("", new Window.WindowStyle(gs.getCommonFont(), Color.WHITE, new TextureRegionDrawable(
                 Assets.gameBg)));
         puzzle = gs.getMyGame();
         gameScreen = gs;

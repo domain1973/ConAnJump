@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
 
 /**
  * Created by Administrator on 2014/7/21.
@@ -23,7 +22,6 @@ public class BaseScreen extends ScreenAdapter {
     private boolean backFlag;
     private float y_bar;
     private Stage stage;
-    private Batch batch;
     private MyGame MyGame;
     private Image layerBg;
 
@@ -31,18 +29,16 @@ public class BaseScreen extends ScreenAdapter {
         stage = new Stage();
         this.MyGame = MyGame;
         y_bar = Assets.HEIGHT - Assets.TOPBAR_HEIGHT;
-        batch = stage.getBatch();
         float scale = Assets.HEIGHT / 854;//default
-        Assets.gameFont.setScale(scale);
-        Assets.otherFont.setScale(scale);
-        Assets.readmeFont.setScale(scale);
-        Assets.quizFont.setScale(scale);
+        Assets.commonFont.setScale(scale);
+        Assets.windowFont.setScale(scale);
+        Assets.gameScreenFont.setScale(scale);
     }
 
     @Override
     public void show() {
         Image bg = new Image(Assets.gameBg);
-        bg.setBounds(0, 0, Assets.WIDTH, Assets.HEIGHT);
+        bg.setBounds(0, 0, Assets.WIDTH, 800 * Assets.WIDTH / 450);
         addActor(bg);
         createBackground();
         Gdx.input.setInputProcessor(stage); // 设置输入接收器
@@ -80,24 +76,20 @@ public class BaseScreen extends ScreenAdapter {
         return MyGame;
     }
 
-    public BitmapFont getGameFont() {
-        return Assets.gameFont;
+    public BitmapFont getWindowFont() {
+        return Assets.windowFont;
     }
 
-    public BitmapFont getOtherFont() {
-        return Assets.otherFont;
+    public BitmapFont getGameScreenFont() {
+        return Assets.gameScreenFont;
     }
 
-    public BitmapFont getQuizFont() {
-        return Assets.quizFont;
+    public BitmapFont getCommonFont() {
+        return Assets.commonFont;
     }
 
     public Stage getStage() {
         return stage;
-    }
-
-    public Batch getBatch() {
-        return batch;
     }
 
     public float getY_bar() {

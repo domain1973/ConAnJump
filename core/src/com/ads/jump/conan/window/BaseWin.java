@@ -16,8 +16,4 @@ public class BaseWin extends Window {
         layerBg = new Image(Assets.layerBg);
         layerBg.setBounds(0, 0, Assets.WIDTH, Assets.HEIGHT);
     }
-
-    public Image getLayerBg() {
-        return layerBg;
-    }
 }

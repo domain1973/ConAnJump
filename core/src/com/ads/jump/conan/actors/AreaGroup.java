@@ -15,9 +15,8 @@ import java.util.List;
  * Created by Administrator on 2014/7/6.
  */
 public class AreaGroup extends Group {
-    private int gateNum;
     private Shape[] shapes = new Shape[36];//所有的方框
-    private Shape[] gateShapes = new Shape[0];//当前关卡的方框
+    private List<Shape> gateShapes = new ArrayList<Shape>();//当前关卡的方框
     private List<SpriteImage> gateSprites = new ArrayList<SpriteImage>();//当前关卡的精灵
 
     public AreaGroup() {
@@ -39,24 +38,32 @@ public class AreaGroup extends Group {
     }
 
     public void handler(int num) {
-        gateNum = num;
+        for (Shape actor : shapes) {
+            actor.setSprite(null);
+        }
         for (Shape actor : gateShapes) {
             actor.remove();
         }
+        gateShapes.clear();
         for (SpriteImage actor : gateSprites) {
             actor.remove();
         }
+        gateSprites.clear();
 
-        String[] strings = Answer.CHALLENGES.get(gateNum);
-        gateShapes = new Shape[strings.length];
+        int[] strings = Answer.CHALLENGES.get(num);
         for (int i=0; i<strings.length; i++) {
-            String str = strings[i];
-            String[] splits = str.split(",");//0=pos 1=sprite
-            Shape shape = shapes[Integer.parseInt(splits[0])];
-            gateShapes[i] = shape;
-            addActor(shape);
-            if ("1".equals(splits[1])) {
-                SpriteImage si = new SpriteImage();
+            int f = strings[i];
+            if (f != 0) {
+                Shape shape = shapes[i];
+                gateShapes.add(shape);
+                addActor(shape);
+            }
+        }
+        for (int i=0; i<strings.length; i++) {
+            int f = strings[i];
+            if (f == 2) {
+                Shape shape = shapes[i];
+                SpriteImage si = new SpriteImage(i);
                 si.setPosition(shape.getX(), shape.getY());
                 shape.setSprite(si);
                 gateSprites.add(si);
@@ -79,28 +86,26 @@ public class AreaGroup extends Group {
         shapes[id].setSprite(null);
         shapes[newId].setSprite(spriteImage);
         spriteImage.setPosition(shapes[newId].getX(), shapes[newId].getY());
+        spriteImage.setId(newId);
     }
 
-    public int find(SpriteImage resId) {
-        int destId = getId(resId.getX(), resId.getY());
-        if (destId != -1) {
+    public Vector2 find(SpriteImage spriteImage) {
+        int destId = getId(spriteImage.getX(), spriteImage.getY());
+        if (destId != -1 && spriteImage.getId() != destId) {
             SpriteImage si = shapes[destId].getSpriteImage();
             if (si == null) {
-                int besideId = getBesideId(resId.getId(), destId);
-                si = shapes[besideId].getSpriteImage();
-                if (si != null) {
-                    si.remove();
-                    shapes[besideId].setSprite(null);
-                    return destId;
+                int besideId = getBesideId(spriteImage.getId(), destId);
+                if (besideId != -1 && shapes[besideId].getSpriteImage() != null) {
+                    return new Vector2(destId, besideId);
                 }
             }
         }
-        return -1;
+        return null;
     }
 
     private int getId(float x, float y) {
         for (Shape shape : gateShapes) {
-            if (shape.contains(x, y)) {
+            if (shape.contains(x + Assets.SHAPE_SIZE/2, y + Assets.SHAPE_SIZE/2)) {
                 return shape.getId();
             }
         }
@@ -115,6 +120,21 @@ public class AreaGroup extends Group {
         return gateSprites;
     }
 
+    public boolean isBesideSpriteImage(int id) {
+        for (Vector2 vector2 : shapes[id].getRelatives()) {
+            int besideId = (int)vector2.x;
+            int destId = (int)vector2.y;
+            if (shapes[besideId].getSpriteImage() != null) {
+                for (Shape shape : gateShapes) {
+                    if (shape.getId() == destId && shape.getSpriteImage() == null) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public class Shape extends Image {
         private int id;
         private Rectangle bounds;
@@ -127,7 +147,6 @@ public class AreaGroup extends Group {
             float y = Assets.AREA_Y + (5 - i / 6) * Assets.SHAPE_SIZE;
             float x = i%6 * Assets.SHAPE_SIZE;
             setBounds(x, y, Assets.SHAPE_SIZE, Assets.SHAPE_SIZE);
-            System.out.println("xxxxxxxxxxxx==========" + x + "    yyyyyyyyyyyy==========" + y);
             bounds = new Rectangle(x, y, Assets.SHAPE_SIZE, Assets.SHAPE_SIZE);
             fillRelativeShapes();
         }
@@ -136,8 +155,13 @@ public class AreaGroup extends Group {
             String[] strings = Answer.SHAPES.get(id);
             for (String string : strings) {
                 String[] strs = string.split(",");
-                relatives.add(new Vector2(Float.parseFloat(strs[0]), Float.parseFloat(strs[1])));
+                float beside = Float.parseFloat(strs[0]);
+                relatives.add(new Vector2(beside, Float.parseFloat(strs[1])));
             }
+        }
+
+        public List<Vector2>  getRelatives() {
+            return relatives;
         }
 
         public int getId() {

@@ -14,15 +14,22 @@ public class SpriteImage extends Group {
     private float x = 0;
     private float y = 0;
 
-    public SpriteImage() {
-        Image conan = new Image(Assets.conan);
+    public SpriteImage(int shapeId) {
+        Image conan = new Image(Assets.jumper);
         conan.setWidth(Assets.SHAPE_SIZE);
         conan.setHeight(Assets.SHAPE_SIZE);
         addActor(conan);
         setOrigin(Assets.SHAPE_SIZE, Assets.SHAPE_SIZE);
+        id = shapeId;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {
         return id;
     }
+
+
 }

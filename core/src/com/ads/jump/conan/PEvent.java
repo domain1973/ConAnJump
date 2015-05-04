@@ -10,12 +10,6 @@ public abstract class PEvent {
 
     public abstract void exit(MainScreen ms);
 
-    public abstract void sos(GameScreen gs);
-
-    public abstract void invalidateSos();
-
-    public abstract void resetGame();
-
     public abstract void share();
 
     public abstract void install(Series series);
@@ -26,13 +20,15 @@ public abstract class PEvent {
 
     public abstract void about();
 
-    public abstract void netSlowInfo();
+    public abstract void showNetFailInfo();
 
     public abstract void spotAd();
 
     public abstract boolean isAdEnable();
 
-    public abstract void help(int level);
+    public abstract void help();
 
     public abstract void pass();
+
+    public abstract void showClickAdInfo();
 }

@@ -59,13 +59,13 @@ public class AdGameScreen extends BaseScreen {
             Gdx.input.setInputProcessor(getStage());
         }
         if (Assets.seriesList.size() == 0) {
-            getMyGame().getPEvent().netSlowInfo();
+            getMyGame().getPEvent().showNetFailInfo();
         }
     }
 
     private void createAdLabel() {
         String str = "爱迪精品";
-        BitmapFont font = getOtherFont();
+        BitmapFont font = getCommonFont();
         Label l = new Label(str, new Label.LabelStyle(font, Color.WHITE));
         float w = font.getBounds(str).width;
         l.setBounds((Assets.WIDTH - w) / 2, getY_bar(), Assets.TOPBAR_HEIGHT, Assets.TOPBAR_HEIGHT);

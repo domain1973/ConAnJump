@@ -12,6 +12,33 @@ android {
         }
 
         instrumentTest.setRoot('tests')
+
+        defaultConfig {
+            minSdkVersion 8
+            targetSdkVersion 19
+            versionCode 100
+            versionName "1.0.0"
+        }
+
+        signingConfigs {
+            release {
+                storeFile file("conanjump.jks")
+                storePassword "CONANJUMP"
+                keyAlias "ConanJump"
+                keyPassword "CONANJUMP"
+            }
+        }
+        buildTypes {
+            release {
+                minifyEnabled true
+                proguardFiles 'proguard-project.txt'
+                signingConfig android.signingConfigs.release
+            }
+            debug {
+                minifyEnabled false
+                proguardFiles 'proguard-project.txt'
+            }
+        }
     }
 }
 // needed to add JNI shared libraries to APK when compiling on CLI
@@ -126,4 +153,5 @@ dependencies {
     compile files('libs/ShareSDK-Wechat-Core-2.3.12.jar')
     compile files('libs/ShareSDK-Wechat-Favorite-2.3.12.jar')
     compile files('libs/ShareSDK-Wechat-Moments-2.3.12.jar')
+    compile files('libs/domob_android_sdk.jar')
 }

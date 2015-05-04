@@ -78,7 +78,7 @@ public class OtherScreen extends BaseScreen {
         star = new Image(new TextureRegionDrawable(Assets.star));
         star.setBounds(Assets.WIDTH - Assets.TOPBAR_HEIGHT, getY_bar(), Assets.TOPBAR_HEIGHT, Assets.TOPBAR_HEIGHT);
 
-        BitmapFont font = getOtherFont();
+        BitmapFont font = getCommonFont();
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE); // 创建一个Label样式，使用默认白色字体
         String str = getStarNumInfo();
         BitmapFont.TextBounds bounds = font.getBounds(str);

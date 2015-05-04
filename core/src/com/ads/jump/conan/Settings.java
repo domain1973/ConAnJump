@@ -20,5 +20,5 @@ public class Settings {
     public static boolean musicEnabled;
     public static boolean soundEnabled;
     public static int unlockGateNum;
-    public static int helpNum;
+    public static boolean clickedAd;
 }

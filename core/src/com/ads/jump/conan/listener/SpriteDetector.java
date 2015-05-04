@@ -1,7 +1,10 @@
 package com.ads.jump.conan.listener;
 
+import com.ads.jump.conan.actors.SpriteImage;
 import com.ads.jump.conan.screen.GameScreen;
 import com.badlogic.gdx.input.GestureDetector;
+
+import java.util.List;
 
 /**
  * Created by Administrator on 2014/7/4.
@@ -20,13 +23,15 @@ public class SpriteDetector extends GestureDetector {
         gameScreen = gs;
     }
 
-    /**
-     * 获取旁边的Shape ID
-     * @param id
-     * @return
-     */
-    private int[] getO(int id) {
-        return null;
+    public boolean isFailure() {
+        boolean b = true;
+        List<SpriteImage> spriteImages = gameScreen.getAreaGroup().getGateSprites();
+        for (SpriteImage spriteImage : spriteImages) {
+            if (gameScreen.getAreaGroup().isBesideSpriteImage(spriteImage.getId())) {
+                b = false;
+            }
+        }
+        return b;
     }
 
     public boolean isPass() {

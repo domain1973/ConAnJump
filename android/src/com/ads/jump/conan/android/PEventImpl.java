@@ -14,15 +14,13 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.ads.jump.conan.android.R;
 import com.ads.jump.conan.Answer;
-import com.ads.jump.conan.Assets;
 import com.ads.jump.conan.PEvent;
 import com.ads.jump.conan.Series;
 import com.ads.jump.conan.Settings;
-import com.ads.jump.conan.screen.GameScreen;
 import com.ads.jump.conan.screen.MainScreen;
 import com.baidu.inf.iis.bcs.BaiduBCS;
 import com.baidu.inf.iis.bcs.auth.BCSCredentials;
@@ -134,7 +132,7 @@ public class PEventImpl extends PEvent {
         sharedata.putBoolean("music", Settings.musicEnabled);
         sharedata.putBoolean("sound", Settings.soundEnabled);
         sharedata.putInt("passNum", Settings.unlockGateNum);
-        sharedata.putInt("helpNum", Settings.helpNum);
+        sharedata.putBoolean("clickedAd", Settings.clickedAd);
         StringBuffer sb = new StringBuffer();
         for (Integer starNum : Answer.gateStars) {
             sb.append(starNum).append(",");
@@ -166,7 +164,7 @@ public class PEventImpl extends PEvent {
     }
 
     @Override
-    public void netSlowInfo() {
+    public void showNetFailInfo() {
         handler.post(new Runnable() {
             public void run() {
                 new AlertDialog.Builder(launcher).setTitle(Constant.SHARE_TITLE).setMessage(
@@ -185,66 +183,6 @@ public class PEventImpl extends PEvent {
         handler.post(new Runnable() {
             public void run() {
                 launcher.spot();
-            }
-        });
-    }
-
-    @Override
-    public void sos(final GameScreen gs) {
-        handler.post(new Runnable() {
-            public void run() {
-                new AlertDialog.Builder(launcher).setTitle(Constant.title).setMessage("您还有" + Settings.helpNum + "次机会,需要帮助吗?")
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Settings.helpNum = Settings.helpNum - 1;
-                                gs.useSos();
-                            }
-                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                }).setIcon(R.drawable.xiaozi).create().show();
-            }
-        });
-    }
-
-    @Override
-    public void invalidateSos() {
-        handler.post(new Runnable() {
-            public void run() {
-                new AlertDialog.Builder(launcher).setTitle(Constant.title).setMessage("智慧星不够,点击分享可以获取智慧星哦!")
-                        .setPositiveButton("关闭", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        }).setNeutralButton("分享", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        showShare();
-                    }
-                }).setIcon(R.drawable.xiaozi).create().show();
-            }
-        });
-    }
-
-    @Override
-    public void resetGame() {
-        handler.post(new Runnable() {
-            public void run() {
-                new AlertDialog.Builder(launcher).setTitle(Constant.title).setMessage("是否重置您的进度?").setPositiveButton("是", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Settings.unlockGateNum = 0;
-                        Answer.gateStars.clear();
-                        Answer.gateStars.add(0);
-                        save();
-                    }
-                }).setNegativeButton("否", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                }).setIcon(R.drawable.xiaozi).create().show();
             }
         });
     }
@@ -464,37 +402,19 @@ public class PEventImpl extends PEvent {
     }
 
     @Override
-    public void help(final int level) {
+    public void help() {
         handler.post(new Runnable() {
             public void run() {
-                String readme = "";
-                switch (level) {
-                    case 0:
-                        readme = "初级: \n" +
-                                "1 飞机的摆放位置及方向都已经预先给出. \n" +
-                                "2 正确地摆放拼图,让拼图上的飞机能覆盖白色飞机图案上.";
-                        break;
-                    case 1:
-                        readme = "中级: \n" +
-                                "1 飞机的摆放位置及飞行路线都已预先给出,但不包含飞机的摆放方向. \n" +
-                                "2 将飞机分别放在圆圈标明的6个区点上.飞机的摆放方向必须顺着航线方向(虚线必须穿过机头和机尾).";
-                        break;
-                    case 2:
-                        readme = "高级: \n" +
-                                "1 飞机的航线及摆放方向都已预先给出,但不包含飞机的摆放位置. \n" +
-                                "2 将拼图上的飞机对照箭头的方向放置在航线上.飞机的头尾方向必须与航线一致(从机头到机尾把飞机路线完整覆盖住).";
-                        break;
-                    case 3:
-                        readme = "专家: \n" +
-                                "1 仅仅提供跑道部分. \n" +
-                                "2 将飞机放在直线跑道上(在同一条跑道上的飞机的头尾摆放方向必须一致).";
-                }
-                new AlertDialog.Builder(launcher).setTitle(Constant.SHARE_TITLE).setMessage(readme)
+                String readme  = "按住柯南,让他跨越与之相邻的柯南,被跨越的柯南将会消失.屏幕上只剩一个柯南即通关.";//TODO
+                ImageView img = new ImageView(launcher);
+                img.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                img.setImageResource(R.drawable.readme);
+                new AlertDialog.Builder(launcher).setMessage(readme).setView(img)
                         .setNegativeButton("关闭", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                             }
-                        }).setIcon(R.drawable.xiaozi).create().show();
+                        }).create().show();
             }
         });
     }
@@ -519,6 +439,22 @@ public class PEventImpl extends PEvent {
                         .setNegativeButton("关闭", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                            }
+                        }).setIcon(R.drawable.xiaozi).create().show();
+            }
+        });
+    }
+
+    @Override
+    public void showClickAdInfo() {
+        handler.post(new Runnable() {
+            public void run() {
+                new AlertDialog.Builder(launcher).setTitle(Constant.SHARE_TITLE).setMessage(
+                        "点击一次广告可激活关卡!")
+                        .setNegativeButton("关闭", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                spotAd();
                             }
                         }).setIcon(R.drawable.xiaozi).create().show();
             }

@@ -14,14 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
  * Created by Administrator on 2014/7/4.
  */
 public class SpriteListener extends GestureDetector.GestureAdapter {
-    private static final float THREE_PLANE_SIZE = Assets.SHAPE_SIZE * 6;
-    private static final float THREE_PLANE_SIZE_ADD_TOP_H = Assets.TOPBAR_HEIGHT + Assets.SHAPE_SIZE * 6;
     private Stage stage;
     private GameScreen gameScreen;
     private Vector3 touchPoint;
     private AreaGroup areaGroup;
     private Vector2 rawVector;
-    private int destId;
+    private int destId = -1;
+    private int besideId = -1;
     private SpriteImage downSpriteImage;
 
     public SpriteListener(Stage stage, GameScreen gs) {
@@ -57,11 +56,13 @@ public class SpriteListener extends GestureDetector.GestureAdapter {
             float x1 = downSpriteImage.getX() + deltaX;
             float y1 = downSpriteImage.getY() - deltaY;
             downSpriteImage.setPosition(x1, y1);
-            destId = areaGroup.find(downSpriteImage);
-            if (destId != -1) {
-                gameScreen.runFlash(destId);
+            Vector2 vector2 = areaGroup.find(downSpriteImage);
+            if (vector2 != null) {
+                destId = (int) vector2.x;
+                besideId = (int) vector2.y;
             } else {
-                gameScreen.stopFlash();
+                destId = -1;
+                besideId = -1;
             }
         }
         return super.pan(x, y, deltaX, deltaY);
@@ -79,45 +80,19 @@ public class SpriteListener extends GestureDetector.GestureAdapter {
             plane2pool(downSpriteImage);
             Assets.soundBtn();
         }
-        gameScreen.stopFlash();
     }
 
-//    private int getFlashVector(SpriteImage spriteImage) {
-//        int x = getX(spriteImage.getX());
-//        if (spriteImage.getX() < 0 || x == THREE_PLANE_SIZE) {
-//            return -1;
-//        }
-//        int y = getY(spriteImage.getY());
-//        if (y < 0) {
-//            return -1;
-//        }
-//        if (y >= (int) THREE_PLANE_SIZE_ADD_TOP_H) {
-//            return -1;
-//        }
-//        return areaGroup.find(spriteImage.getId(), x, y);
-//    }
-
     private void plane2pool(SpriteImage spriteImage) {
-        if (destId != -1) {
+        if (destId != -1 && besideId != -1) {
+            SpriteImage si = areaGroup.getShapes()[besideId].getSpriteImage();
+            if (si != null) {
+                areaGroup.getShapes()[besideId].setSprite(null);
+                areaGroup.getGateSprites().remove(si);
+                si.remove();
+            }
             areaGroup.move(spriteImage, destId);
         } else {
             spriteImage.setPosition(rawVector.x, rawVector.y);
         }
-    }
-
-    private int getX(float x) {
-        float size = Assets.SHAPE_SIZE;
-        int x1 = (int) (x / size);
-        return (int) (x1 * size);
-    }
-
-    private int getY(float y) {
-        float size = Assets.SHAPE_SIZE;
-        float t = Assets.HEIGHT - y - size - Assets.TOPBAR_HEIGHT;
-        if (t < 0) {
-            return -1;
-        }
-        int y1 = (int) (t / size);
-        return (int) (y1 * size + Assets.TOPBAR_HEIGHT);
     }
 }

@@ -18,6 +18,10 @@ public class MyGame extends Game {
         setScreen(loadingScreen);
     }
 
+    public void convert2MainScreen() {
+        setScreen(loadingScreen.getMainScreen());
+    }
+
     public MainScreen getMainScreen() {
         return loadingScreen.getMainScreen();
     }

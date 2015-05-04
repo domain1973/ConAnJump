@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
@@ -32,7 +31,7 @@ public class GateScreen extends OtherScreen {
     private GameScreen gameScreen;
     private GateImageBtn[] gateImageBtns;
     private Label[] gateNumLabs;
-    private Label.LabelStyle yellowStyle;
+    private Label.LabelStyle commonStyle;
     private int gatePage = 0;
     private BitmapFont font;
 
@@ -42,32 +41,34 @@ public class GateScreen extends OtherScreen {
         gameScreen = new GameScreen(this);
         gateImageBtns = new GateImageBtn[Assets.SCREEN_GATE_MAX];
         gateNumLabs = new Label[Assets.SCREEN_GATE_MAX];
-        font = getOtherFont();
+        font = getCommonFont();
         font.setScale(Assets.WIDTH / 480 * (float)0.8);
-        yellowStyle = new Label.LabelStyle(font, Color.GREEN);
+        commonStyle = new Label.LabelStyle(font, Color.WHITE);
     }
 
     @Override
     public void show() {
         if (!isShow()) {
             super.show();
+            float y = Assets.HEIGHT/2;
             float btnSize = Assets.WIDTH / 5;
             leftBtn = new Image(new TextureRegionDrawable(Assets.levelPreBtn));
-            leftBtn.setBounds(0, 0, btnSize, btnSize);
+            leftBtn.setBounds(0, y, btnSize, btnSize);
             leftBtn.setOrigin(btnSize/2, btnSize/2);
             float moveX = Assets.WIDTH / 16;
             float duration = (float) 0.5;
-            Action complexAction = repeat(2000, sequence(moveTo(moveX, 0, duration), moveTo(0, 0, duration)));
+            Action complexAction = repeat(2000, sequence(moveTo(moveX, y, duration), moveTo(0, y, duration)));
             leftBtn.addAction(complexAction);
             rightBtn = new Image(new TextureRegionDrawable(Assets.levelNextBtn));
             float x = Assets.WIDTH - btnSize;
-            rightBtn.setBounds(x, 0, btnSize, btnSize);
+            rightBtn.setBounds(x, y, btnSize, btnSize);
             rightBtn.setOrigin(btnSize / 2, btnSize / 2);
-            complexAction = repeat(2000, sequence(moveTo(x - moveX, 0, duration), moveTo(x, 0, duration)));
+            complexAction = repeat(2000, sequence(moveTo(x - moveX, y, duration), moveTo(x, y, duration)));
             rightBtn.addAction(complexAction);
             addBtnListens();
-            btnVisiableHandle(0);
-            buildGateImage(0);
+            gatePage = getPageNo(Settings.unlockGateNum);
+            btnVisiableHandle(gatePage);
+            buildGateImage(gatePage);
             setShow(true);
         } else {
             Gdx.input.setInputProcessor(getStage());
@@ -122,7 +123,7 @@ public class GateScreen extends OtherScreen {
                 Rectangle bound = new Rectangle(0, 0, returnBtn.getWidth(), returnBtn.getHeight());
                 if (bound.contains(x, y)) {
                     Assets.playSound(Assets.btnSound);
-                    getMyGame().setScreen(getMyGame().getMainScreen());
+                    getMyGame().convert2MainScreen();
                 }
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -207,8 +208,12 @@ public class GateScreen extends OtherScreen {
                 if (bound.contains(x, y)) {
                     Assets.playSound(Assets.btnSound);
                     if (gateNum <= Settings.unlockGateNum) {
-                        gameScreen.handleNewGate(gateNum);
-                        getMyGame().setScreen(gameScreen);
+                        if (isNeedClickAD(gateNum)) {
+                            getMyGame().getPEvent().showClickAdInfo();
+                        } else {
+                            gameScreen.handleNewGate(gateNum);
+                            getMyGame().setScreen(gameScreen);
+                        }
                     }
                 }
                 super.touchUp(event, x, y, pointer, button);
@@ -217,9 +222,9 @@ public class GateScreen extends OtherScreen {
         gateImageBtns[i] = gateImageBtn;
         addActor(gateImageBtn);
         String temp = (gateNum + 1) + "";
-        Label labGateNum = new Label(temp, yellowStyle);
+        Label labGateNum = new Label(temp, commonStyle);
         BitmapFont.TextBounds bounds = font.getBounds(temp);
-        labGateNum.setPosition(gateImageBtn.getX(), gateImageBtn.getY() + gateImageBtn.getHeight() - bounds.height);
+        labGateNum.setPosition(gateImageBtn.getX(), gateImageBtn.getY() - bounds.height);
         gateNumLabs[i] = labGateNum;
         addActor(labGateNum);
     }
@@ -253,5 +258,13 @@ public class GateScreen extends OtherScreen {
 
     public void setGatePage(int gatePage) {
         this.gatePage = gatePage;
+    }
+
+    public boolean isNeedClickAD(int gateNum) {
+        return gateNum == 12 && !Settings.clickedAd;
+    }
+
+    public int getPageNo(int gateNo) {
+        return gateNo / Assets.SCREEN_GATE_MAX;
     }
 }

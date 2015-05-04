@@ -11,10 +11,9 @@ public class GateImageBtn extends ImageButton {
 
     public GateImageBtn(Drawable imageUp, int id) {
         super(imageUp);
-        float gateBtnSize = Assets.WIDTH / 6;
-        float gateBtnSpace = Assets.WIDTH / 36;
-        float y_off = Assets.HEIGHT / 4;
+        float x_off = Assets.WIDTH/7;
+        float gateBtnSize = x_off - x_off/8;
         float hspace = Assets.HEIGHT / 8;
-        setBounds((id % 5 + 1) * gateBtnSpace + id % 5 * gateBtnSize, Assets.HEIGHT - y_off - id / 5 * hspace,gateBtnSize,gateBtnSize);
+        setBounds(x_off + id % 5 * x_off, Assets.HEIGHT*3/4 - id / 5 * hspace,gateBtnSize,gateBtnSize);
     }
 }

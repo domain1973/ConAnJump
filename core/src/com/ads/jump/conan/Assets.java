@@ -35,11 +35,10 @@ public class Assets {
     public static Music musicbg;
     public static Sound btnSound;
     public static Sound starSound;
-    public static TextureRegion startBg;
     public static TextureRegion gameBg;
     public static TextureRegion winBg;
     public static TextureRegion layerBg;
-    public static TextureRegion gameareaBg;
+    public static TextureRegion helpBg;
     public static TextureRegion star;
     public static TextureRegion star_null;
     public static TextureRegion about;
@@ -52,7 +51,7 @@ public class Assets {
     public static TextureRegion reset;
     public static TextureRegion light;
     public static TextureRegion cube;
-    public static TextureRegion conan;
+    public static TextureRegion jumper;
     public static TextureRegion gate;
     public static TextureRegion next;
     public static TextureRegion suspend;
@@ -68,7 +67,6 @@ public class Assets {
     public static TextureRegion gate_2star;
     public static TextureRegion gate_3star;
     public static TextureRegion gate_lock;
-    public static TextureRegion flash;
     public static int GATE_MAX = 48;//TODO
     public static int SCREEN_GATE_MAX = 25;
     public static int LEVEL_GATE_MAX = 12;
@@ -83,20 +81,18 @@ public class Assets {
     public static float SHAPE_SIZE;
     public static float PLANE_BIG_SIZE;
     public static float AREA_Y;
-    public static BitmapFont gameFont;
-    public static BitmapFont otherFont;
-    public static BitmapFont readmeFont;
-    public static BitmapFont quizFont;
+    public static BitmapFont commonFont;
+    public static BitmapFont windowFont;
+    public static BitmapFont gameScreenFont;
     public static List<Series> seriesList;
 
     public static void load() {
         assetManager = new AssetManager();
         assetManager.load("p.atlas", TextureAtlas.class);
-        assetManager.load("puzzle.fnt", BitmapFont.class);
-        assetManager.load("game.fnt", BitmapFont.class);
-        assetManager.load("readme.fnt", BitmapFont.class);
-        assetManager.load("quiz.fnt", BitmapFont.class);
-        assetManager.load("data/musicbg.wav", Music.class); //加载背景音乐
+        assetManager.load("common.fnt", BitmapFont.class);
+        assetManager.load("gamescreen.fnt", BitmapFont.class);
+        assetManager.load("window.fnt", BitmapFont.class);
+        assetManager.load("data/musicbg.mp3", Music.class); //加载背景音乐
         assetManager.load("data/btn.wav", Sound.class);
         assetManager.load("data/star.mp3", Sound.class);
     }
@@ -106,13 +102,12 @@ public class Assets {
     }
 
     public static void initData() {
-        gameFont = assetManager.get("puzzle.fnt", BitmapFont.class);
-        otherFont = assetManager.get("game.fnt", BitmapFont.class);
-        readmeFont = assetManager.get("readme.fnt", BitmapFont.class);
-        quizFont = assetManager.get("quiz.fnt", BitmapFont.class);
+        commonFont = assetManager.get("common.fnt", BitmapFont.class);
+        windowFont = assetManager.get("window.fnt", BitmapFont.class);
+        gameScreenFont = assetManager.get("gamescreen.fnt", BitmapFont.class);
         btnSound = assetManager.get("data/btn.wav", Sound.class);
         starSound = assetManager.get("data/star.mp3", Sound.class);
-        musicbg = assetManager.get("data/musicbg.wav", Music.class);    //加载背景音乐
+        musicbg = assetManager.get("data/musicbg.mp3", Music.class);    //加载背景音乐
         initConstants();
         TextureAtlas atlas = assetManager.get("p.atlas", TextureAtlas.class);
         loadBmps(atlas);
@@ -135,12 +130,10 @@ public class Assets {
     }
 
     private static void loadBmps(TextureAtlas atlas) {
-        startBg = atlas.findRegion("startbg");
         gameBg = atlas.findRegion("gamebg");
         layerBg = atlas.findRegion("layerbg");//图层背景,对话框使用
         winBg = atlas.findRegion("winbg");
-        gameareaBg = atlas.findRegion("gamearea");
-        flash = atlas.findRegion("flash");
+        helpBg = atlas.findRegion("readme");
 
         suspend = atlas.findRegion("suspend");
         share = atlas.findRegion("share");
@@ -154,7 +147,7 @@ public class Assets {
         help = atlas.findRegion("help");
         refresh = atlas.findRegion("refresh");
         cube = atlas.findRegion("cube");
-        conan = atlas.findRegion("conna");
+        jumper = atlas.findRegion("jumper");
         gate = atlas.findRegion("gate");
         music = atlas.findRegion("muisc");
         sound = atlas.findRegion("sound");
@@ -218,10 +211,6 @@ public class Assets {
 
     public static void soundBtn() {
         playSound(btnSound);
-    }
-
-    public static void soundStar() {
-        playSound(starSound);
     }
 
     private static void loadMusic() {
